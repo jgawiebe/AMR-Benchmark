@@ -1,0 +1,190 @@
+{
+  "snr": 18.0,
+  "n": 64,
+  "sps": null,
+  "fading": null,
+  "rows": [
+    {
+      "generated": "BPSK",
+      "top_index": 24,
+      "agreement": 0.828125,
+      "mean_confidence": 0.8241276144981384,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "QPSK",
+      "top_index": 24,
+      "agreement": 0.609375,
+      "mean_confidence": 0.5916556119918823,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "8PSK",
+      "top_index": 24,
+      "agreement": 0.625,
+      "mean_confidence": 0.6040309071540833,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "16PSK",
+      "top_index": 24,
+      "agreement": 0.75,
+      "mean_confidence": 0.7499116659164429,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "32PSK",
+      "top_index": 24,
+      "agreement": 0.703125,
+      "mean_confidence": 0.6902095079421997,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "64PSK",
+      "top_index": 24,
+      "agreement": 0.828125,
+      "mean_confidence": 0.7532463669776917,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "4QAM",
+      "top_index": 24,
+      "agreement": 0.734375,
+      "mean_confidence": 0.729511559009552,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "8QAM",
+      "top_index": 24,
+      "agreement": 0.765625,
+      "mean_confidence": 0.7464287877082825,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "16QAM",
+      "top_index": 24,
+      "agreement": 0.75,
+      "mean_confidence": 0.7139579057693481,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "32QAM",
+      "top_index": 24,
+      "agreement": 0.765625,
+      "mean_confidence": 0.7359069585800171,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "64QAM",
+      "top_index": 24,
+      "agreement": 0.703125,
+      "mean_confidence": 0.6804788112640381,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "128QAM",
+      "top_index": 24,
+      "agreement": 0.625,
+      "mean_confidence": 0.6270964741706848,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "256QAM",
+      "top_index": 24,
+      "agreement": 0.71875,
+      "mean_confidence": 0.7137880325317383,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "2FSK",
+      "top_index": 2,
+      "agreement": 1.0,
+      "mean_confidence": 1.0,
+      "nominal_name_at_index": "8PSK"
+    },
+    {
+      "generated": "4FSK",
+      "top_index": 2,
+      "agreement": 0.65625,
+      "mean_confidence": 0.6476231813430786,
+      "nominal_name_at_index": "8PSK"
+    },
+    {
+      "generated": "8FSK",
+      "top_index": 2,
+      "agreement": 0.890625,
+      "mean_confidence": 0.8909231424331665,
+      "nominal_name_at_index": "8PSK"
+    },
+    {
+      "generated": "16FSK",
+      "top_index": 2,
+      "agreement": 0.703125,
+      "mean_confidence": 0.7194504141807556,
+      "nominal_name_at_index": "8PSK"
+    },
+    {
+      "generated": "4PAM",
+      "top_index": 24,
+      "agreement": 0.78125,
+      "mean_confidence": 0.753796398639679,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "8PAM",
+      "top_index": 24,
+      "agreement": 0.75,
+      "mean_confidence": 0.739183783531189,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "16PAM",
+      "top_index": 24,
+      "agreement": 0.6875,
+      "mean_confidence": 0.6573480367660522,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "AM-DSB",
+      "top_index": 24,
+      "agreement": 0.96875,
+      "mean_confidence": 0.97428297996521,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "AM-DSB-SC",
+      "top_index": 8,
+      "agreement": 0.171875,
+      "mean_confidence": 0.177683025598526,
+      "nominal_name_at_index": "16QAM"
+    },
+    {
+      "generated": "AM-USB",
+      "top_index": 14,
+      "agreement": 1.0,
+      "mean_confidence": 0.9998828172683716,
+      "nominal_name_at_index": "4FSK"
+    },
+    {
+      "generated": "AM-LSB",
+      "top_index": 18,
+      "agreement": 1.0,
+      "mean_confidence": 0.9999955892562866,
+      "nominal_name_at_index": "8PAM"
+    },
+    {
+      "generated": "FM",
+      "top_index": 24,
+      "agreement": 0.859375,
+      "mean_confidence": 0.8660686612129211,
+      "nominal_name_at_index": "FM"
+    },
+    {
+      "generated": "PM",
+      "top_index": 24,
+      "agreement": 0.8125,
+      "mean_confidence": 0.8317716717720032,
+      "nominal_name_at_index": "FM"
+    }
+  ]
+}
