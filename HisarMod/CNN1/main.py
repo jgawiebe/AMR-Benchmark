@@ -23,7 +23,7 @@ import mltools,rmldataset2016
 import rmlmodels.CNN2Model as cnn2
 import pandas as pd
 import numpy as np
-from keras.utils.np_utils import to_categorical
+from keras.utils import to_categorical
 import h5py
 classes = ['BPSK',
                'QPSK',

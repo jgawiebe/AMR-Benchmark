@@ -18,7 +18,6 @@ import mltools,dataset2016
 import rmlmodels.MCLDNN as mcl
 import csv
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 #set Keras data format as channels_first
 K.set_image_data_format('channels_last')
 print(K.image_data_format())

@@ -16,9 +16,8 @@ from keras.callbacks import LearningRateScheduler,TensorBoard
 from keras.regularizers import *
 from keras.optimizers import adam
 from keras.models import model_from_json
-#from keras.utils.vis_utils import plot_model
+#from keras.utils import plot_model
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 import mltools,rmldataset2016
 import rmlmodels.DAE as culstm
 import csv

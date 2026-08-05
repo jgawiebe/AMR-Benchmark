@@ -2,8 +2,8 @@ import os
 
 from keras.models import Model
 from keras.layers import Input,Dense,Conv1D,MaxPool1D,ReLU,Dropout,Softmax,BatchNormalization,TimeDistributed
-from keras.layers import LSTM,CuDNNLSTM,Bidirectional,Flatten,LSTM,Reshape,Lambda
-from keras.utils.vis_utils import plot_model
+from keras.layers import LSTM,Bidirectional,Flatten,Reshape,Lambda
+from keras.utils import plot_model
 
 def DAE(weights=None,
              input_shape=[1024,2],
@@ -18,9 +18,9 @@ def DAE(weights=None,
     x = input
     dr=0
     #LSTM Unit
-    x,s,c = CuDNNLSTM(units=32,return_state = True,return_sequences = True)(x)
+    x,s,c = LSTM(units=32,return_state = True,return_sequences = True)(x)
     x = Dropout(dr)(x)
-    x,s1,c1 = CuDNNLSTM(units=32,return_state = True,return_sequences = True)(x)
+    x,s1,c1 = LSTM(units=32,return_state = True,return_sequences = True)(x)
     #Classifier
     xc = Dense(32,activation='relu')(s1)
     xc = BatchNormalization()(xc)

@@ -27,13 +27,13 @@ def CLDNNLikeModel(weights=None,
 
     dr = 0.5
     input_x = Input(input_shape1+[1],name='input')
-    x = Conv2D(256, (1, 3), activation="relu", name="conv1", init='glorot_uniform')(input_x) # (b,c,h,w) (b,h,w,c)
+    x = Conv2D(256, (1, 3), activation="relu", name="conv1", kernel_initializer='glorot_uniform')(input_x) # (b,c,h,w) (b,h,w,c)
     x = Dropout(dr)(x)
-    x = Conv2D(256, (2, 3), activation="relu", name="conv2", init='glorot_uniform')(x)  # (b,c,h,w) (b,h,w,c)
+    x = Conv2D(256, (2, 3), activation="relu", name="conv2", kernel_initializer='glorot_uniform')(x)  # (b,c,h,w) (b,h,w,c)
     x = Dropout(dr)(x)
-    x = Conv2D(80, (1, 3), activation="relu", name="conv3", init='glorot_uniform')(x)  # (b,c,h,w) (b,h,w,c)
+    x = Conv2D(80, (1, 3), activation="relu", name="conv3", kernel_initializer='glorot_uniform')(x)  # (b,c,h,w) (b,h,w,c)
     x = Dropout(dr)(x)
-    x = Conv2D(80, (1, 3), activation="relu", name="conv4", init='glorot_uniform')(x)  # (b,c,h,w) (b,h,w,c)
+    x = Conv2D(80, (1, 3), activation="relu", name="conv4", kernel_initializer='glorot_uniform')(x)  # (b,c,h,w) (b,h,w,c)
     x = Dropout(dr)(x)
     # 形如（samples，timesteps，input_dim）的3D张量
     x1 = Reshape((80, 1016))(x)
@@ -56,7 +56,7 @@ import keras
 if __name__ == '__main__':
     model = CLDNNLikeModel(None,input_shape=(2,1024),classes=24)
 
-    adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+    adam = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
     model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer=adam)
 
     print('models layers:', model.layers)

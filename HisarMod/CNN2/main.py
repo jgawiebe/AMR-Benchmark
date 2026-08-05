@@ -7,7 +7,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import numpy as np
 import matplotlib
 import keras
-from keras.utils.np_utils import to_categorical
+from keras.utils import to_categorical
 import keras.backend as K
 from keras.callbacks import LearningRateScheduler
 from keras.regularizers import *
@@ -17,7 +17,6 @@ import pandas as pd
 import mltools
 import rmlmodels.CNN as mcl
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 import h5py
 classes = ['BPSK',
                'QPSK',

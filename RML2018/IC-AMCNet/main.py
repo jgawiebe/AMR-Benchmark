@@ -15,7 +15,6 @@ import keras
 import mltools,dataset2016
 import rmlmodels.MCLDNN_A as mcl
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 
 
 # Set Keras data format as channels_last

@@ -15,12 +15,11 @@ from keras.callbacks import LearningRateScheduler
 from keras.regularizers import *
 from keras.optimizers import adam
 from keras.models import model_from_json
-#from keras.utils.vis_utils import plot_model
+#from keras.utils import plot_model
 
 import mltools,dataset2016
 import rmlmodels.DenseNet as mcl
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 
 
 

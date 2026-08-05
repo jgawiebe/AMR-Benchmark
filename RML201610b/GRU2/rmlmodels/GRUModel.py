@@ -10,8 +10,8 @@ import os
 
 from keras.models import Model
 from keras.layers import Input,Dense,Conv1D,MaxPool1D,ReLU,Dropout,Softmax
-from keras.layers import Bidirectional,Flatten,CuDNNGRU
-from keras.utils.vis_utils import plot_model
+from keras.layers import Bidirectional,Flatten,GRU
+from keras.utils import plot_model
 
 def GRUModel(weights=None,
              input_shape=[128,2],
@@ -26,8 +26,8 @@ def GRUModel(weights=None,
     x = input
 
     #LSTM Unit
-    x = CuDNNGRU(units=128,return_sequences = True)(x)
-    x = CuDNNGRU(units=128)(x)
+    x = GRU(units=128,return_sequences = True)(x)
+    x = GRU(units=128)(x)
 
     #DNN
     x = Dense(classes,activation='softmax',name='softmax')(x)
@@ -44,7 +44,7 @@ import keras
 if __name__ == '__main__':
     model = LSTMModel(None,input_shape=(128,2),classes=11)
 
-    adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+    adam = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
     model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer=adam)
     plot_model(model, to_file='model.png',show_shapes=True) # print model
 

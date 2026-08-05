@@ -2,10 +2,10 @@ import os
 import tensorflow as tf
 import math
 from keras.models import Model
-from keras.layers import Input, Dense, Conv1D, MaxPool1D, ReLU, Dropout, Softmax, concatenate, Flatten, Reshape, \
+from keras.layers import Input,Dense,Conv1D,MaxPool1D,ReLU,Dropout,Softmax,concatenate,Flatten,Reshape,\
     GaussianNoise,Activation,GaussianDropout
-from keras.layers.convolutional import Conv2D
-from keras.layers import CuDNNLSTM,Lambda,Multiply,Add,Subtract,MaxPool2D,CuDNNGRU,LeakyReLU,BatchNormalization
+from keras.layers import Conv2D
+from keras.layers import LSTM,Lambda,Multiply,Add,Subtract,MaxPool2D,GRU,LeakyReLU,BatchNormalization
 import tensorflow as tf
 
 def CGDNN(weights=None,
@@ -34,7 +34,7 @@ def CGDNN(weights=None,
     x3 = GaussianDropout(dr)(x3)
     x11 = concatenate([x1, x3],3)
     x4 = Reshape(target_shape=((50, 472)), name='reshape4')(x11)
-    x4 = CuDNNGRU(units=50)(x4)
+    x4 = GRU(units=50)(x4)
     x4 = GaussianDropout(dr)(x4)
     x = Dense(256, activation='relu', name='fc4',kernel_initializer='he_normal')(x4)
     x = GaussianDropout(dr)(x)
@@ -49,12 +49,12 @@ def CGDNN(weights=None,
 
 
 import keras
-from keras.utils.vis_utils import plot_model
+from keras.utils import plot_model
 
 if __name__ == '__main__':
     model = CGDNN(None, classes=10)
 
-    adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+    adam = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
     model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer=adam)
     plot_model(model, to_file='model.png', show_shapes=True)  # print model
     print('models layers:', model.layers)

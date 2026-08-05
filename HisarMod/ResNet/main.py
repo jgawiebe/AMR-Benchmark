@@ -18,16 +18,15 @@ from keras.callbacks import LearningRateScheduler
 from keras.regularizers import *
 from keras.optimizers import adam
 from keras.models import model_from_json
-#from keras.utils.vis_utils import plot_model
+#from keras.utils import plot_model
 
 import mltools
 import rmlmodels.ResNet as mcl
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 
 import pandas as pd
 
-from keras.utils.np_utils import to_categorical
+from keras.utils import to_categorical
 
 classes = ['BPSK',
                'QPSK',

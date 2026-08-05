@@ -10,8 +10,8 @@ import os
 
 from keras.models import Model
 from keras.layers import Input,Dense,ReLU,Dropout,Activation,concatenate,Softmax,Conv2D,MaxPool2D,Add,BatchNormalization
-from keras.layers import Bidirectional,Flatten,CuDNNGRU
-from keras.utils.vis_utils import plot_model
+from keras.layers import Bidirectional,Flatten,GRU
+from keras.utils import plot_model
 
 def ResNet(weights=None,
              input_shape=[2,1024],
@@ -51,7 +51,7 @@ import keras
 if __name__ == '__main__':
     model =  ResNet(None,input_shape=[2,128],classes=11)
 
-    adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+    adam = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
     model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer=adam)
 
     print('models layers:', model.layers)

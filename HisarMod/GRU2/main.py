@@ -12,10 +12,9 @@ from keras.regularizers import *
 from keras.optimizers import adam
 from keras.models import model_from_json
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 import mltools
 import rmlmodels.GRUModel as culstm
-from keras.utils.np_utils import to_categorical
+from keras.utils import to_categorical
 import pandas as pd
 classes = ['BPSK',
                'QPSK',

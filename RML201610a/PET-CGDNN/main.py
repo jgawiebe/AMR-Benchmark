@@ -17,7 +17,6 @@ from keras.models import model_from_json
 import mltools,dataset2016
 import rmlmodels.PETCGDNN as DLAMRMODEL
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 from keras.models import Model
 import csv,time
 

@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 from keras.models import Model
-from keras.layers import Input,Dense,Conv1D,MaxPool1D,ReLU,Dropout,Softmax,concatenate,Conv2D,CuDNNLSTM
+from keras.layers import Input,Dense,Conv1D,MaxPool1D,ReLU,Dropout,Softmax,concatenate,Conv2D,LSTM
 from keras.layers import LSTM,Permute,Reshape,ZeroPadding2D,Activation
 
 
@@ -18,16 +18,16 @@ def CLDNNLikeModel(weights=None,
     dr = 0.5
     input_x = Input(input_shape1+[1],name='input')
 
-    x = Conv2D(256, (1, 3), activation="relu", name="conv1", init='glorot_uniform')(input_x) # (b,c,h,w) (b,h,w,c)
+    x = Conv2D(256, (1, 3), activation="relu", name="conv1", kernel_initializer='glorot_uniform')(input_x) # (b,c,h,w) (b,h,w,c)
     x = Dropout(dr)(x)
-    x = Conv2D(256, (2, 3), activation="relu", name="conv2", init='glorot_uniform')(x)  # (b,c,h,w) (b,h,w,c)
+    x = Conv2D(256, (2, 3), activation="relu", name="conv2", kernel_initializer='glorot_uniform')(x)  # (b,c,h,w) (b,h,w,c)
     x = Dropout(dr)(x)
-    x = Conv2D(80, (1, 3), activation="relu", name="conv3", init='glorot_uniform')(x)  # (b,c,h,w) (b,h,w,c)
+    x = Conv2D(80, (1, 3), activation="relu", name="conv3", kernel_initializer='glorot_uniform')(x)  # (b,c,h,w) (b,h,w,c)
     x = Dropout(dr)(x)
-    x = Conv2D(80, (1, 3), activation="relu", name="conv4", init='glorot_uniform')(x)  # (b,c,h,w) (b,h,w,c)
+    x = Conv2D(80, (1, 3), activation="relu", name="conv4", kernel_initializer='glorot_uniform')(x)  # (b,c,h,w) (b,h,w,c)
     x = Dropout(dr)(x)
     x1 = Reshape((80, 120))(x)
-    lstm_out = CuDNNLSTM(units=50)(x1)
+    lstm_out = LSTM(units=50)(x1)
     x = Dense(128, activation='relu', name="dense1")(lstm_out)
     x = Dropout(dr)(x)
     output = Dense(11, activation='softmax',name="dense2")(x)
@@ -44,7 +44,7 @@ import keras
 if __name__ == '__main__':
     model = CLDNNLikeModel(None,input_shape=(2,128),classes=11)
 
-    adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+    adam = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
     model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer=adam)
 
     print('models layers:', model.layers)

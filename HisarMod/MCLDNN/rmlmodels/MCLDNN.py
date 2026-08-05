@@ -12,8 +12,8 @@ WEIGHTS_PATH = ('resnet_like_weights_tf_dim_ordering_tf_kernels.h5')
 
 from keras.models import Model
 from keras.layers import Input,Dense,Conv1D,MaxPool1D,ReLU,Dropout,Softmax,concatenate,Flatten,Reshape
-from keras.layers.convolutional import Conv2D
-from keras.layers import CuDNNLSTM
+from keras.layers import Conv2D
+from keras.layers import LSTM
 
 
 def MCLDNN(weights=None,
@@ -34,7 +34,7 @@ def MCLDNN(weights=None,
     # SeparateChannel Combined Convolutional Neural Networks
     x1=Conv2D(50,(2,8),padding='same', activation="relu", name="conv1_1", kernel_initializer='glorot_uniform')(input1)
     x2=Conv1D(50,8,padding='causal', activation="relu", name="conv1_2", kernel_initializer='glorot_uniform')(input2)
-    x2_reshape=Reshape([-1,1024,50])(x2)
+    x2_reshape=Reshape([-1,1024,50],name='reshap1')(x2)
     x3=Conv1D(50,8,padding='causal', activation="relu", name="conv1_3", kernel_initializer='glorot_uniform')(input3)
     x3_reshape=Reshape([-1,1024,50],name='reshap2')(x3)
     x=concatenate([x2_reshape,x3_reshape],axis=1)
@@ -44,8 +44,8 @@ def MCLDNN(weights=None,
     #LSTM Unit
     # batch_size,64,2
     x= Reshape(target_shape=((1020,100)),name='reshape')(x)
-    x = CuDNNLSTM(units=128,return_sequences = True)(x)
-    x = CuDNNLSTM(units=128)(x)
+    x = LSTM(units=128,return_sequences = True)(x)
+    x = LSTM(units=128)(x)
 
     #DNN
     x = Dense(128,activation='selu',name='fc1')(x)
@@ -64,11 +64,11 @@ def MCLDNN(weights=None,
 
 
 import keras
-from keras.utils.vis_utils import plot_model
+from keras.utils import plot_model
 if __name__ == '__main__':
     model = MCLDNN(None,classes=10)
 
-    adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+    adam = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
     model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer=adam)
     plot_model(model, to_file='model.png',show_shapes=True) # print model
     print('models layers:', model.layers)

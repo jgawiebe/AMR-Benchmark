@@ -3,9 +3,9 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 # os.environ["THEANO_FLAGS"]  = "device=gpu%d"%(0)
 import numpy as np
 import keras.models as models
-from keras.layers.core import Reshape,Dense,Dropout,Activation,Flatten
-from keras.layers.convolutional import Convolution2D,Conv2D, MaxPooling2D, ZeroPadding2D
-from keras.layers.core import Activation
+from keras.layers import Reshape,Dense,Dropout,Activation,Flatten
+from keras.layers import Convolution2D,Conv2D, MaxPooling2D, ZeroPadding2D
+from keras.layers import Activation
 from keras.layers import Input, Dense, Conv1D, MaxPool1D, ReLU, Dropout, Softmax, concatenate, Flatten, Reshape, \
     GaussianNoise,Activation,GaussianDropout
 from keras.models import Model

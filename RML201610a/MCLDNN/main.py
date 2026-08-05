@@ -18,7 +18,6 @@ from keras.models import model_from_json
 import mltools,dataset2016
 import rmlmodels.MCLDNN as mcl
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 from keras.models import Model
 import csv
 

@@ -17,7 +17,6 @@ import csv
 import mltools,dataset2016
 import rmlmodels.DenseNet as mcl
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 
 (mods,snrs,lbl),(X_train,Y_train),(X_val,Y_val),(X_test,Y_test),(train_idx,val_idx,test_idx) = \
     dataset2016.load_data()

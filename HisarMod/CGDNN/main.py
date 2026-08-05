@@ -18,9 +18,8 @@ from keras.models import model_from_json
 import mltools
 import rmlmodels.CGDNN as mcl
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 from keras.models import Model
-from keras.utils.np_utils import to_categorical
+from keras.utils import to_categorical
 import pandas as pd
 classes = ['BPSK',
                'QPSK',

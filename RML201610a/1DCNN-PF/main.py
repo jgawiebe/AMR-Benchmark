@@ -18,17 +18,11 @@ import mltools,dataset2016
 import rmlmodels.DCNNPF as mcl
 import tensorflow as tf
 import csv
-import keras.backend.tensorflow_backend as KTF
 
 
 # Set Keras data format as channels_last
 K.set_image_data_format('channels_last')
 print(K.image_data_format())
-config = tf.ConfigProto()
-config.gpu_options.allow_growth=True
-sess = tf.Session(config=config)
-
-KTF.set_session(sess)
 (mods,snrs,lbl),(X_train,Y_train),(X_val,Y_val),(X_test,Y_test),(train_idx,val_idx,test_idx) = \
     dataset2016.load_data()
 

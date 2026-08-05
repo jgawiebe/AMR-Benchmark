@@ -11,10 +11,10 @@ import tensorflow as tf
 WEIGHTS_PATH = ('resnet_like_weights_tf_dim_ordering_tf_kernels.h5')
 import math
 from keras.models import Model
-from keras.layers import Input, Dense, Conv1D, MaxPool1D, ReLU, Dropout, Softmax, concatenate, Flatten, Reshape, \
+from keras.layers import Input,Dense,Conv1D,MaxPool1D,ReLU,Dropout,Softmax,concatenate,Flatten,Reshape,\
     GaussianNoise
-from keras.layers.convolutional import Conv2D
-from keras.layers import CuDNNLSTM,Lambda,Multiply,Add,Subtract,MaxPool2D,CuDNNGRU,LeakyReLU,BatchNormalization
+from keras.layers import Conv2D
+from keras.layers import LSTM,Lambda,Multiply,Add,Subtract,MaxPool2D,GRU,LeakyReLU,BatchNormalization
 import tensorflow as tf
 
 def cal1(x):
@@ -76,8 +76,8 @@ def PETCGDNN(weights=None,
         x3)
     # temporal feature
     x4 = Reshape(target_shape=((1013,25)), name='reshape4')(x3)
-    # x4 = CuDNNLSTM(units=128, return_sequences=True)(x4)
-    x4= CuDNNGRU(units=128)(x4)
+    # x4 = LSTM(units=128, return_sequences=True)(x4)
+    x4= GRU(units=128)(x4)
 
     # x = Dense(128, activation='relu', name='fc4')(x4)
     # x = Dropout(dr)(x)
@@ -94,12 +94,12 @@ def PETCGDNN(weights=None,
 
 
 import keras
-from keras.utils.vis_utils import plot_model
+from keras.utils import plot_model
 
 if __name__ == '__main__':
     model = PETCGDNN(None, classes=10)
 
-    adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+    adam = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
     model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer=adam)
     plot_model(model, to_file='model.png', show_shapes=True)  # print model
     print('models layers:', model.layers)

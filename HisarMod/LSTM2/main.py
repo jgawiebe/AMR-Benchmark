@@ -18,13 +18,12 @@ from keras.callbacks import LearningRateScheduler,TensorBoard
 from keras.regularizers import *
 from keras.optimizers import adam
 from keras.models import model_from_json
-#from keras.utils.vis_utils import plot_model
+#from keras.utils import plot_model
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 import mltools
 import rmlmodels.CuDNNLSTMModel as culstm
 
-from keras.utils.np_utils import to_categorical
+from keras.utils import to_categorical
 import pandas as pd
 
 def to_amp_phase(X_train, X_val, X_test, nsamples):

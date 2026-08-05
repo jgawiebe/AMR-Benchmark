@@ -15,12 +15,10 @@ from keras.callbacks import LearningRateScheduler,TensorBoard
 from keras.regularizers import *
 from keras.optimizers import adam
 from keras.models import model_from_json
-#from keras.utils.vis_utils import plot_model
+#from keras.utils import plot_model
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 import mltools
 import rmlmodels.DAE as culstm
-from keras.utils import multi_gpu_model
 def l2_normalize(x, axis=-1):
     y = np.sum(x ** 2, axis, keepdims=True)
     return x / np.sqrt(y)

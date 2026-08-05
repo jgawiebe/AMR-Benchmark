@@ -11,9 +11,9 @@ import os
 WEIGHTS_PATH = ('resnet_like_weights_tf_dim_ordering_tf_kernels.h5')
 
 from keras.models import Model
-from keras.layers import Input,Dense,Conv1D,MaxPool1D,ReLU,Dropout,Softmax,concatenate,Flatten,Reshape,LeakyReLU,Subtract,CuDNNGRU
-from keras.layers.convolutional import Conv2D
-from keras.layers import CuDNNLSTM,AveragePooling2D,MaxPool2D,Add
+from keras.layers import Input,Dense,Conv1D,MaxPool1D,ReLU,Dropout,Softmax,concatenate,Flatten,Reshape,LeakyReLU,Subtract,GRU
+from keras.layers import Conv2D
+from keras.layers import LSTM,AveragePooling2D,MaxPool2D,Add
 
 
 def MCNET(weights=None,
@@ -148,11 +148,11 @@ def MCNET(weights=None,
 
     return model
 import keras
-from keras.utils.vis_utils import plot_model
+from keras.utils import plot_model
 if __name__ == '__main__':
     model = MCLDNN(None,classes=24)
 
-    adam = keras.optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+    adam = keras.optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False)
     model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer=adam)
     plot_model(model, to_file='model.png',show_shapes=True) # print model
     print('models layers:', model.layers)

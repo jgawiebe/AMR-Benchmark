@@ -16,11 +16,10 @@ import keras
 import mltools
 import rmlmodels.ICAMC as mcl
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 
 
 import pandas as pd
-from keras.utils.np_utils import to_categorical
+from keras.utils import to_categorical
 classes = ['BPSK',
                'QPSK',
                '8PSK',

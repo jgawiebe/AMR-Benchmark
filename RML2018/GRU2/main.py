@@ -19,7 +19,6 @@ from keras.regularizers import *
 from keras.optimizers import adam
 from keras.models import model_from_json
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 import mltools,rmldataset2016
 import rmlmodels.GRUModel as culstm
 

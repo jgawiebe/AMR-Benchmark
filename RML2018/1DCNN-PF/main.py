@@ -17,7 +17,6 @@ from keras.models import model_from_json
 import mltools
 import rmlmodels.DCNNPF as mcl
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 def to_amp_phase(X_train, X_val, X_test, nsamples):
     X_train_cmplx = X_train[:, :,0] + 1j * X_train[:, :,1]
     X_val_cmplx = X_val[:, :,0] + 1j * X_val[:, :,1]

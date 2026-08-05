@@ -17,7 +17,6 @@ from keras.models import model_from_json
 import mltools,dataset2016
 import rmlmodels.CLDNN as mcl
 import tensorflow as tf
-import keras.backend.tensorflow_backend as KTF
 from keras.models import Model
 import csv
 (mods,snrs,lbl),(X_train,Y_train),(X_val,Y_val),(X_test,Y_test),(train_idx,val_idx,test_idx) = \
