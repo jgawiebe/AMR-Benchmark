@@ -95,8 +95,10 @@ elif n_distinct >= 20:
           "consistent with the label remap being a permutation of the `classes` list.\n"
           "Use the mapping above to relabel confusion matrices.")
 else:
-    print("\nMixed result: partial separation. Inspect per-modulation rows above before\n"
-          "drawing conclusions; try --snr 18 --sps 22 to reduce generator mismatch.")
+    print("\nPartial separation: a few gross spectral categories come back stable while\n"
+          "the PSK/QAM orders sit near chance. With the generator matched to the paper\n"
+          "(sps=2, raised cosine, beta=0.35) this is the observed outcome, and it does\n"
+          "not resolve the class mapping. See PORT_HANDOFF.md.")
 
 if args.json:
     with open(args.json, 'w') as fh:

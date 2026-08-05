@@ -17,19 +17,15 @@ LAYOUT.  Channel 0 = real, channel 1 = imaginary. Not amplitude/phase -- other
 models in this repo use that convention, CNN1 does not. 1024 samples is fixed by
 the Flatten layer.
 
-SYMBOL RATE.  HisarMod oversamples very little. Its 99% occupied bandwidth is
-0.50-0.56 of fs (measured per class at +18 dB), which for RRC with beta=0.35
-implies roughly 2-3 samples/symbol. SPS_RANGE is set accordingly.
+SYMBOL RATE / PULSE.  Taken from the HisarMod paper (arXiv 1911.04970, Sec. II),
+which is the dataset's own source: oversampling rate 2, raised cosine pulse
+shaping, roll-off 0.35. Defaults here match that exactly.
 
-  Do not trust a cyclostationary estimate averaged across classes here -- that
-  suggests ~22 sps, which is an artefact of averaging and produces signals ~45%
-  too narrow. Probing the model with 6-32 sps collapses 22 of 26 modulations onto
-  a single output index; with sps=2-3 they spread over 13-14 indices. Bandwidth
-  match matters more than anything else in this file.
-
-  Caveat: at sps=2 the generated bandwidth is 0.61 vs the 0.50-0.56 target, at
-  sps=3 it is 0.43. Neither matches exactly, and integer upsampling cannot hit
-  the ~2.4 sps the target implies. Some mismatch remains.
+  Do not trust a cyclostationary estimate averaged across classes -- that
+  suggests ~22 sps, an averaging artefact that produces signals ~45% too narrow.
+  Probing the model at 6-32 sps collapses 22 of 26 modulations onto one output
+  index; at the correct sps=2 they spread out. Bandwidth match dominates
+  everything else in this file.
 
 CAVEAT.  These are textbook constructions, not a reproduction of HisarMod's
 generator. Notably HisarMod applies fading channels (ideal/static/Rayleigh/
@@ -40,7 +36,8 @@ it is what makes these signals an independent test of the model.
 import numpy as np
 
 N_SAMPLES = 1024
-SPS_RANGE = (2, 5)           # samples/symbol drawn per example unless pinned
+SPS = 2                      # HisarMod paper: "oversampling rate is chosen as 2"
+SPS_RANGE = (2, 3)           # only used if sps='random' is requested
 DEFAULT_BETA = 0.35          # RRC rolloff
 
 # HisarMod's 26 classes, in the order main.py lists them.
@@ -107,30 +104,30 @@ def pam_constellation(M):
 # pulse shaping
 # --------------------------------------------------------------------------
 
-def rrc_filter(beta, span, sps):
-    """Root-raised-cosine, unit energy."""
+def rc_filter(beta, span, sps):
+    """Raised cosine, unit energy.
+
+    RAISED cosine, not ROOT raised cosine: the HisarMod paper (arXiv 1911.04970,
+    Sec. II) states "raised cosine pulse shaping filter is employed with roll-off
+    factor of 0.35". RRC would be the transmit half of a matched-filter pair; the
+    dataset applies the full Nyquist pulse, so the stored waveform is RC-shaped.
+    """
     N = int(span * sps)
     t = (np.arange(N + 1) - N / 2.0) / sps
     h = np.empty_like(t)
     for i, ti in enumerate(t):
-        if abs(ti) < 1e-10:
-            h[i] = 1.0 + beta * (4 / np.pi - 1)
-        elif beta > 0 and abs(abs(ti) - 1.0 / (4 * beta)) < 1e-10:
-            h[i] = (beta / np.sqrt(2)) * (
-                (1 + 2 / np.pi) * np.sin(np.pi / (4 * beta))
-                + (1 - 2 / np.pi) * np.cos(np.pi / (4 * beta)))
+        if beta > 0 and abs(abs(ti) - 1.0 / (2 * beta)) < 1e-10:
+            h[i] = (np.pi / 4) * np.sinc(1.0 / (2 * beta))
         else:
-            num = (np.sin(np.pi * ti * (1 - beta))
-                   + 4 * beta * ti * np.cos(np.pi * ti * (1 + beta)))
-            den = np.pi * ti * (1 - (4 * beta * ti) ** 2)
-            h[i] = num / den
+            h[i] = (np.sinc(ti) * np.cos(np.pi * beta * ti)
+                    / (1 - (2 * beta * ti) ** 2))
     return h / np.sqrt(np.sum(h ** 2))
 
 
 def _shape(symbols, sps, beta):
     up = np.zeros(len(symbols) * sps, dtype=complex)
     up[::sps] = symbols
-    h = rrc_filter(beta, span=8, sps=sps)
+    h = rc_filter(beta, span=8, sps=sps)
     return np.convolve(up, h, mode='same')
 
 
@@ -259,12 +256,13 @@ def add_awgn(sig, snr_db, rng):
 # public API
 # --------------------------------------------------------------------------
 
-def generate(mod, snr_db, n=1, sps=None, beta=DEFAULT_BETA, cfo=None,
+def generate(mod, snr_db, n=1, sps=SPS, beta=DEFAULT_BETA, cfo=None,
              fading=None, seed=None):
     """Generate `n` examples of `mod` at `snr_db`.
 
     mod     one of CLASSES
-    sps     samples/symbol; None draws from SPS_RANGE per example
+    sps     samples/symbol; defaults to 2 per the HisarMod paper.
+            Pass sps=None to draw randomly from SPS_RANGE instead.
     cfo     carrier freq offset in cycles/sample; None draws +-0.001
     fading  None|'ideal'|'static'|'rayleigh'|'rician'
     returns (n, 2, 1024, 1) float32, ready for model.predict
