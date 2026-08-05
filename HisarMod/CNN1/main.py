@@ -90,21 +90,32 @@ test_snr  = np.load(os.path.join(DATA, 'test_snr.npy')).reshape(-1, 1)
 
 # [N,2,1024] -> the models want a trailing channel axis, [N,2,1024,1]
 np.random.seed(2016)   # reproducible split
-n_examples = train.shape[0]
+
+# Restrict to high-SNR examples. HisarMod ships 20 SNR levels from -20 to +18 dB
+# in 2 dB steps; MIN_SNR=0 keeps the upper 10, i.e. half of train and test.
+# Set AMR_MIN_SNR=-100 to train on the full SNR range as upstream does.
+MIN_SNR = int(os.environ.get('AMR_MIN_SNR', 0))
+train_pool = np.flatnonzero(train_snr.ravel() >= MIN_SNR)
+test_pool = np.flatnonzero(test_snr.ravel() >= MIN_SNR)
+if len(train_pool) == 0 or len(test_pool) == 0:
+    sys.exit(f"no examples at SNR >= {MIN_SNR} dB")
+
+n_examples = len(train_pool)
 n_train = int(n_examples * 0.8)
-n_val = int(n_examples * 0.2)
+n_val = n_examples - n_train
 # Indices are kept SORTED for the gather below: these are fancy-index reads out of
 # a 4.3 GB memmap, and random order turns a sequential scan into 416k seeks.
 # fit() reshuffles every epoch anyway, so ordering here costs nothing.
-train_idx = np.sort(np.random.choice(n_examples, size=n_train, replace=False))
-val_idx = np.sort(np.setdiff1d(np.arange(n_examples), train_idx))
+train_idx = np.sort(train_pool[np.random.choice(len(train_pool), size=n_train, replace=False)])
+val_idx = np.sort(np.setdiff1d(train_pool, train_idx))
 X_train = train[train_idx][..., np.newaxis]
 Y_train = train_labels[train_idx]
 X_val = train[val_idx][..., np.newaxis]
 Y_val = train_labels[val_idx]
-X_test = test[..., np.newaxis]
-Y_test = test_labels
-Z_test = test_snr
+X_test = test[test_pool][..., np.newaxis]
+Y_test = test_labels[test_pool]
+Z_test = test_snr[test_pool]
+print(f"SNR >= {MIN_SNR} dB: train {len(train_idx):,} / val {len(val_idx):,} / test {len(test_pool):,}")
 
 # Upstream set nb_epoch = 10000. On this machine an epoch is ~6 min on CPU, so
 # that ceiling is ~41 days; EarlyStopping is what actually ends the run. Capped
