@@ -25,3 +25,6 @@ val_acc.txt
 val_loss.txt
 acc*.csv
 acc*.dat
+
+# probe result artifacts
+synthetic/probe_*.json
