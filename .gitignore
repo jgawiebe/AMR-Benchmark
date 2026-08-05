@@ -14,3 +14,14 @@ __pycache__/
 
 # local session handoff notes (not for the fork)
 PORT_HANDOFF.md
+
+# training run outputs (checkpoints are ~157 MB each)
+weights/
+figure/
+*.log
+train_acc.txt
+train_loss.txt
+val_acc.txt
+val_loss.txt
+acc*.csv
+acc*.dat

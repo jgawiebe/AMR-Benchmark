@@ -7,9 +7,9 @@ os.environ["KERAS_BACKEND"] = "tensorflow"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import numpy as np
 import matplotlib
-import scipy.io as scio
-matplotlib.use('Tkagg')
-import matplotlib.pyplot as plt 
+# 'Agg', not 'Tkagg': this runs headless and Homebrew python3.11 has no tkinter.
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap, BoundaryNorm
 #from matplotlib import pyplot as plt
@@ -17,9 +17,13 @@ import pickle, random, sys
 import keras
 import keras.backend as K
 from keras.callbacks import LearningRateScheduler,TensorBoard
-from keras.optimizers import adam
+# NOTE: `from keras.optimizers import adam` was removed -- lowercase `adam` does
+# not exist in Keras 2.15 (hard ImportError) and was never used; the model is
+# compiled with optimizer='adam' below.
 import pickle, random, sys,h5py
-import mltools,rmldataset2016
+# NOTE: `rmldataset2016` was removed -- no such module exists under HisarMod/, and
+# its only reference was inside a commented-out block in predict().
+import mltools
 import rmlmodels.CNN2Model as cnn2
 import pandas as pd
 import numpy as np
@@ -51,52 +55,67 @@ classes = ['BPSK',
                'AM-LSB',
                 'FM',
                 'PM']
-data1 = h5py.File('/home/neural/ZhangFuXin/AMR/tranining/HisarMod2019.1/Train/train.mat','r')
-train=data1['data_save'][:]
-train=train.swapaxes(0,2)
+# ---------------------------------------------------------------------------
+# Data loading.
+#
+# Upstream read train.mat/test.mat -- MATLAB files the authors produced from the
+# CSV distribution but never shipped, alongside train_labels1.csv/test_labels1.csv
+# (remapped labels, also not shipped). The public HisarMod2019.1 release is CSV
+# only, so _port_tools/hisarmod_csv_to_npy.py rebuilds the equivalent arrays as
+# .npy: float32 (N, 2, 1024) signals, plus labels already remapped to 0..25 from
+# the sparse 2-digit family codes (0,1,2,3,4,10,...,61) the CSV actually ships.
+#
+# The .npy files are opened with mmap_mode='r' -- the train signals alone are
+# 4.3 GB and materialising train + the fancy-indexed train/val copies at once
+# would not fit comfortably in 24 GB.
+# ---------------------------------------------------------------------------
+DATA = os.path.join(os.path.dirname(__file__), '..', '..',
+                    'Datasets', 'HisarMod2019.1', 'npy')
+DATA = os.path.abspath(DATA)
+if not os.path.isdir(DATA):
+    sys.exit(f"missing {DATA}\nrun: .venv/bin/python _port_tools/hisarmod_csv_to_npy.py")
 
-data2 = h5py.File('/home/neural/ZhangFuXin/AMR/tranining/HisarMod2019.1/Test/test.mat','r')
-
-test=data2['data_save'][:]
-test=test.swapaxes(0,2)
-
-train=np.expand_dims(train,axis=3)
-test=np.expand_dims(test,axis=3)
+train = np.load(os.path.join(DATA, 'train_data.npy'), mmap_mode='r')
+test  = np.load(os.path.join(DATA, 'test_data.npy'),  mmap_mode='r')
 
 ##label
-train_labels = pd.read_csv('/home/neural/ZhangFuXin/AMR/tranining/HisarMod2019.1/Train/train_labels1.csv',header=None)
-train_labels=np.array(train_labels)
-train_labels = to_categorical(train_labels, num_classes=None)
-
-test_labels = pd.read_csv('/home/neural/ZhangFuXin/AMR/tranining/HisarMod2019.1/Test/test_labels1.csv',header=None)
-test_labels =np.array(test_labels)
-test_labels = to_categorical(test_labels, num_classes=None)
+train_labels = to_categorical(np.load(os.path.join(DATA, 'train_labels.npy')),
+                              num_classes=len(classes))
+test_labels  = to_categorical(np.load(os.path.join(DATA, 'test_labels.npy')),
+                              num_classes=len(classes))
 
 ##snr
-train_snr=pd.read_csv('/home/neural/ZhangFuXin/AMR/tranining/HisarMod2019.1/Train/train_snr.csv',header=None)
-train_snr=np.array(train_snr)
+train_snr = np.load(os.path.join(DATA, 'train_snr.npy')).reshape(-1, 1)
+test_snr  = np.load(os.path.join(DATA, 'test_snr.npy')).reshape(-1, 1)
 
-test_snr=pd.read_csv('/home/neural/ZhangFuXin/AMR/tranining/HisarMod2019.1/Test/test_snr.csv',header=None)
-test_snr=np.array(test_snr)
-
-# [N,1024,2]
+# [N,2,1024] -> the models want a trailing channel axis, [N,2,1024,1]
+np.random.seed(2016)   # reproducible split
 n_examples = train.shape[0]
 n_train = int(n_examples * 0.8)
 n_val = int(n_examples * 0.2)
-train_idx = list(np.random.choice(range(0, n_examples), size=n_train, replace=False))
-val_idx = list(set(range(0, n_examples)) - set(train_idx))
-np.random.shuffle(train_idx)
-np.random.shuffle(val_idx)
-X_train = train[train_idx]
+# Indices are kept SORTED for the gather below: these are fancy-index reads out of
+# a 4.3 GB memmap, and random order turns a sequential scan into 416k seeks.
+# fit() reshuffles every epoch anyway, so ordering here costs nothing.
+train_idx = np.sort(np.random.choice(n_examples, size=n_train, replace=False))
+val_idx = np.sort(np.setdiff1d(np.arange(n_examples), train_idx))
+X_train = train[train_idx][..., np.newaxis]
 Y_train = train_labels[train_idx]
-X_val = train[val_idx]
+X_val = train[val_idx][..., np.newaxis]
 Y_val = train_labels[val_idx]
-X_test = test
+X_test = test[..., np.newaxis]
 Y_test = test_labels
 Z_test = test_snr
 
-nb_epoch = 10000     # number of epochs to train on
-batch_size = 400  # training batch size
+# Upstream set nb_epoch = 10000. On this machine an epoch is ~6 min on CPU, so
+# that ceiling is ~41 days; EarlyStopping is what actually ends the run. Capped
+# here to something reachable, overridable without editing the file:
+#   AMR_EPOCHS=5 .venv/bin/python main.py
+nb_epoch = int(os.environ.get('AMR_EPOCHS', 100))
+batch_size = int(os.environ.get('AMR_BATCH', 400))  # training batch size
+
+# mltools writes into figure/, and ModelCheckpoint cannot create weights/ itself.
+os.makedirs('weights', exist_ok=True)
+os.makedirs('figure', exist_ok=True)
 # perform training ...
 #   - call the main training loop in keras for our network+dataset
 model = cnn2.CNN2Model()
@@ -113,7 +132,10 @@ history = model.fit(X_train,
     validation_data=(X_val,Y_val),
     callbacks = [
                 keras.callbacks.ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='auto'),
-                keras.callbacks.ReduceLROnPlateau(monitor='val_loss',factor=0.5,verbose=1,patince=5,min_lr=0.000001),
+                # upstream wrote `patince=5` -- a typo Keras silently swallows, so it
+                # has really been running with the default patience=10. Corrected to
+                # the intended 5; set it back to 10 to match upstream's actual runs.
+                keras.callbacks.ReduceLROnPlateau(monitor='val_loss',factor=0.5,verbose=1,patience=5,min_lr=0.000001),
                 keras.callbacks.EarlyStopping(monitor='val_loss', patience=50, verbose=1, mode='auto')
                 #keras.callbacks.TensorBoard(log_dir='./logs/',histogram_freq=1,write_graph=False,write_grads=1,write_images=False,update_freq='epoch')
                 ]

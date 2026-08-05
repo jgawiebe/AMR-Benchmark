@@ -17,14 +17,14 @@ def show_history(history):
 
     plt.figure()
     plt.title('Training accuracy performance')
-    plt.plot(history.epoch, history.history['acc'], label='train_acc')
-    plt.plot(history.epoch, history.history['val_acc'], label='val_acc')
+    plt.plot(history.epoch, history.history.get('acc', history.history.get('accuracy')), label='train_acc')
+    plt.plot(history.epoch, history.history.get('val_acc', history.history.get('val_accuracy')), label='val_acc')
     plt.legend()
     plt.savefig('figure/total_acc.png')
     plt.close()
 
-    train_acc=history.history['acc']
-    val_acc=history.history['val_acc']
+    train_acc=history.history.get('acc', history.history.get('accuracy'))
+    val_acc=history.history.get('val_acc', history.history.get('val_accuracy'))
     train_loss=history.history['loss']
     val_loss=history.history['val_loss']
     epoch=history.epoch
